@@ -11,7 +11,7 @@ A website for the Retrospective Guild in Deepwoken, showcasing guild information
 - Discord server access after application validation
 - Background music with volume control
 
-## Recent Improvements (v0.1.0)
+## Recent Improvements (v1.0.0)
 
 - Added loading screen with animation
 - Improved navigation with smooth scrolling
@@ -36,8 +36,7 @@ A website for the Retrospective Guild in Deepwoken, showcasing guild information
 
 1. Users visit the site and read about the guild
 2. If interested, they fill out the application form with their ROBLOX nickname
-3. They complete the reCAPTCHA verification
-4. After successful submission, they gain access to the Discord invite link
+3. After successful submission, they gain access to the Discord invite link
 
 ## Notes
 
@@ -46,5 +45,5 @@ For full functionality, make sure PHP is enabled on your server and that the ser
 ## Credits
 
 - Created by tari
-- v0.1.0 
+- v1.0.0 
 
