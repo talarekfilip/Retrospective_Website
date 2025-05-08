@@ -1,0 +1,616 @@
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        color: white;
+        font-family: 'Segoe UI', 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+        scrollbar-width: thin;
+        scrollbar-color: #7289DA rgba(0, 0, 0, 0.5);
+    }
+
+    /* Custom Scrollbar */
+    body::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.5);
+    }
+    
+    body::-webkit-scrollbar-thumb {
+        background-color: #7289DA;
+        border-radius: 10px;
+    }
+
+    /* Loading Screen */
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .loading-logo {
+        width: 100px;
+        height: 100px;
+        animation: pulse 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+        from { transform: scale(0.9); opacity: 0.7; }
+        to { transform: scale(1.1); opacity: 1; }
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #7289DA;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Navigation Bar */
+    .navigation {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-logo span {
+        font-size: 20px;
+        font-weight: bold;
+        color: #7289DA;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 20px;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    .nav-link:hover {
+        background: rgba(114, 137, 218, 0.2);
+        color: #7289DA;
+    }
+
+    /* Sky and Stars Animation */
+    .sky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .star {
+        position: absolute;
+        border-radius: 50%;
+        background-color: white;
+        opacity: 0.7;
+        animation: starFall 3s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes starFall {
+        from { transform: translateY(-10px); }
+        to { transform: translateY(100vh); }
+    }
+
+    .title {
+        font-size: 40px;
+        font-weight: bold;
+        text-align: center;
+        margin: 40px 0;
+        padding: 0 20px;
+        width: 100%;
+        max-width: 800px;
+        letter-spacing: 0.5px;
+        margin-top: 100px;
+    }
+
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 95%;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .guild-content {
+        width: 100%;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(5px);
+        letter-spacing: 0.3px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .guild-content:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .guild-content h1 {
+        font-size: 38px;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .guild-content h2 {
+        font-size: 28px;
+        margin: 25px 0;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        padding-bottom: 12px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .guild-content p {
+        font-size: 18px;
+        line-height: 1.8;
+        margin: 20px 0;
+        font-weight: 400;
+    }
+
+    .guild-content ul {
+        padding-left: 25px;
+        margin: 20px 0;
+    }
+
+    .guild-content li {
+        font-size: 18px;
+        margin: 12px 0;
+        line-height: 1.8;
+        font-weight: 400;
+    }
+
+    .guild-content strong {
+        font-weight: 600;
+        color: #7289DA;
+    }
+
+    /* Join Form Styles */
+    .nickname-form {
+        margin: 20px 0 40px;
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 15px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .nickname-form h2 {
+        margin-bottom: 20px;
+        color: #7289DA;
+        font-weight: 600;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    .nickname-form form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+    
+    .nickname-form input {
+        padding: 12px 15px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 16px;
+        width: 100%;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .nickname-form input:focus {
+        border-color: #7289DA;
+        background: rgba(0, 0, 0, 0.7);
+        box-shadow: 0 0 0 3px rgba(114, 137, 218, 0.3);
+    }
+
+    .nickname-form input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .nickname-form .submit-btn {
+        padding: 12px 20px;
+        background-color: #7289DA;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .nickname-form .submit-btn:hover {
+        background-color: #5865F2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .nickname-form .submit-btn.nickname-ready {
+        background-color: #43b581;
+    }
+    
+    .nickname-form .submit-btn.nickname-ready:hover {
+        background-color: #3ca374;
+    }
+
+    .form-message {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 8px;
+        width: 100%;
+        text-align: center;
+        font-weight: 500;
+        display: none;
+        transition: all 0.3s ease;
+    }
+
+    .form-message.success {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        display: block;
+    }
+
+    .form-message.error {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        display: block;
+    }
+
+    .contact {
+        background-color: #7289DA;
+        padding: 15px 30px;
+        border-radius: 8px;
+        margin: 20px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: auto;
+        min-width: 200px;
+        text-align: center;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .contact:hover {
+        background-color: #5865F2;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact a {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+    }
+
+    .contact-icons {
+        margin-top: 10px;
+    }
+
+    .contact-icons i {
+        font-size: 24px;
+    }
+
+    .services {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        width: 100%;
+    }
+
+    .service-guild-info {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 20px 40px;
+        border-radius: 10px;
+        margin: 0 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        min-height: 30px;
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .service-guild-info:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .service-guild-info span {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: auto;
+        width: auto;
+    }
+
+    .spacer {
+        height: 40vh;
+    }
+
+    .contact.locked {
+        background-color: #4a4a4a;
+        cursor: not-allowed;
+    }
+
+    .contact.locked:hover {
+        transform: none;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .contact.locked a {
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    
+    /* Klasa dla potwierdzonej walidacji serwera */
+    .contact.success-confirmed {
+        background-color: #43b581;
+    }
+    
+    .contact.success-confirmed:hover {
+        background-color: #3ca374;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .contact.success-confirmed a {
+        cursor: pointer;
+        pointer-events: auto;
+    }
+
+    /* Footer */
+    .footer {
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        padding: 30px 20px;
+        margin-top: 60px;
+        position: relative;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 40px;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .footer-section h3 {
+        color: #7289DA;
+        margin-bottom: 15px;
+        font-size: 20px;
+    }
+
+    .footer-section p {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+
+    .footer-section ul {
+        list-style: none;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 10px;
+    }
+
+    .footer-section ul li a {
+        color: #ddd;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-section ul li a:hover {
+        color: #7289DA;
+    }
+
+    .made-by {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .title { 
+            font-size: 28px;
+            margin-top: 120px;
+        }
+
+        .content-wrapper {
+            padding: 20px 15px;
+        }
+
+        .guild-content { 
+            padding: 25px 20px;
+        }
+
+        .guild-content h1 { 
+            font-size: 30px;
+        }
+
+        .guild-content h2 { 
+            font-size: 22px;
+        }
+
+        .guild-content p,
+        .guild-content li {
+            font-size: 16px;
+        }
+
+        .contact { 
+            padding: 12px 20px;
+            min-width: 180px;
+        }
+
+        .service {
+            padding: 15px 25px;
+        }
+
+        .navigation {
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .nav-logo {
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            width: 100%;
+            justify-content: space-around;
+        }
+
+        .nav-link {
+            font-size: 14px;
+            padding: 6px 8px;
+        }
+
+        .footer-content {
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .made-by {
+            position: relative;
+            text-align: center;
+            margin-top: 20px;
+            right: auto;
+            bottom: auto;
+        }
+
+        .nickname-form {
+            padding: 20px 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .guild-content {
+            padding: 20px 15px;
+        }
+
+        .guild-content h1 {
+            font-size: 26px;
+        }
+
+        .guild-content h2 {
+            font-size: 20px;
+        }
+    }
