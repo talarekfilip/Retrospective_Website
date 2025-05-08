@@ -7,7 +7,6 @@ A website for the Retrospective Guild in Deepwoken, showcasing guild information
 - Responsive design with dark theme
 - Animated loading screen
 - Star falling animation in the background
-- Application form with reCAPTCHA protection
 - Discord server access after application validation
 - Background music with volume control
 
