@@ -11,7 +11,7 @@ A website for the Retrospective Guild in Deepwoken, showcasing guild information
 - Discord server access after application validation
 - Background music with volume control
 
-## Recent Improvements (v0.1.0)
+## Recent Improvements (v1.0.0)
 
 - Added loading screen with animation
 - Improved navigation with smooth scrolling
