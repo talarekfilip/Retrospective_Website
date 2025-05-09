@@ -24,8 +24,8 @@ A website for the Retrospective Guild in Deepwoken, showcasing guild information
 
 - `index.html` - Main page with guild info and application form
 - `aboutme.html` - About page
-- `ighigwsxhdfnfo.css` - Stylesheet
-- `ighigzrpows.js` - JavaScript functionality
+- `style.css` - Stylesheet
+- `script.js` - JavaScript functionality
 - `save_nickname.php` - Backend for application processing with captcha verification
 - `applications.txt` - Storage file for application data
 - `logo.png/jpg` - Guild logo files
