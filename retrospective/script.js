@@ -200,7 +200,7 @@ function submitNickname(event) {
     console.log("Submitting form data");
     
     // Make AJAX request to submit the form
-    fetch('save_nickname.php', {
+    fetch('script.php', {
         method: 'POST',
         body: formData
     })
