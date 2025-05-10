@@ -12,81 +12,58 @@ header('Access-Control-Allow-Headers: Content-Type');
 // Log the incoming request (without sensitive data)
 error_log("Received nickname submission request");
 
-function verifyRobloxUsername($username) {
-    // Remove any whitespace
-    $username = trim($username);
+// Funkcja do pobierania przybliżonej lokalizacji na podstawie IP
+function getLocationFromIP($ip) {
+    $url = "http://ip-api.com/json/" . $ip;
+    $response = file_get_contents($url);
+    $data = json_decode($response, true);
     
-    // Basic validation
+    if ($data && $data['status'] == 'success') {
+        return $data['country'] . ', ' . $data['city'];
+    }
+    
+    return 'Nieznana lokalizacja';
+}
+
+// Funkcja do weryfikacji nazwy użytkownika Roblox
+function verifyRobloxUsername($username) {
+    if (empty($username)) {
+        return ['valid' => false, 'error' => 'Username is required'];
+    }
+
+    // Sprawdzenie długości nazwy użytkownika
     if (strlen($username) < 3 || strlen($username) > 20) {
         return ['valid' => false, 'error' => 'Username must be between 3 and 20 characters'];
     }
-    
-    // Check if username contains only allowed characters
+
+    // Sprawdzenie dozwolonych znaków
     if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-        return ['valid' => false, 'error' => 'Username can only contain letters, numbers and underscores'];
+        return ['valid' => false, 'error' => 'Username can only contain letters, numbers, and underscores'];
     }
-    
-    // Log validation result
-    error_log("Username passed basic validation: $username");
-    
-    // First try with users/get-by-username endpoint
-    $url = "https://api.roblox.com/users/get-by-username?username=" . urlencode($username);
-    
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        CURLOPT_TIMEOUT => 10,
-        CURLOPT_CONNECTTIMEOUT => 5,
-        CURLOPT_HTTPHEADER => ['Accept: application/json']
-    ]);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
-    if (curl_errno($ch)) {
-        $error = curl_error($ch);
-        curl_close($ch);
-        error_log("Curl Error: " . $error);
-        // Don't return error yet, try alternative method
-    } else {
-        curl_close($ch);
-        
-        if ($httpCode === 200) {
-            $data = json_decode($response, true);
-            if ($data && isset($data['Id']) && $data['Id'] > 0) {
-                return ['valid' => true, 'data' => $data];
-            }
-        }
+
+    // Sprawdzenie czy nazwa użytkownika nie jest zarezerwowana
+    $reserved_usernames = ['admin', 'moderator', 'system', 'bot', 'retrospective'];
+    if (in_array(strtolower($username), $reserved_usernames)) {
+        return ['valid' => false, 'error' => 'This username is reserved'];
     }
-    
-    // If we can't verify through API, assume it's valid (temporary solution)
-    error_log("Assuming username is valid due to API limitations");
+
+    // Sprawdzenie czy nazwa użytkownika nie jest już w użyciu
+    $applications = file_get_contents('applications.txt');
+    if (strpos($applications, $username) !== false) {
+        return ['valid' => false, 'error' => 'This username is already taken'];
+    }
+
     return ['valid' => true, 'data' => ['name' => $username]];
 }
 
-// Weryfikacja i zapis nicku bez wymagania captcha
+// Obsługa żądania AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        // Check if nickname is provided
-        if (!isset($_POST['nickname'])) {
-            error_log("Nickname not set in POST data");
-            echo json_encode(['success' => false, 'error' => 'Nickname is required']);
-            exit;
-        }
-        
-        $nickname = $_POST['nickname'];
-        
-        // Verify Roblox username
-        $verification = verifyRobloxUsername($nickname);
-        if (!$verification['valid']) {
-            error_log("Username verification failed: " . $verification['error']);
-            echo json_encode(['success' => false, 'error' => $verification['error']]);
-            exit;
-        }
-        
+    $data = json_decode(file_get_contents('php://input'), true);
+    $nickname = $data['nickname'] ?? '';
+
+    $result = verifyRobloxUsername($nickname);
+
+    if ($result['valid']) {
         try {
             // Save to applications.txt with timestamp
             $timestamp = date('Y-m-d H:i:s');
@@ -96,18 +73,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Error writing to applications.txt");
             }
             
-            echo json_encode(['success' => true]);
+            // Pobieranie danych klienta
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $location = getLocationFromIP($ip);
             
+            // Formatowanie danych do zapisu
+            $user_data = $nickname . ':' . $ip . ':' . $location . "\n";
+            
+            // Zapisywanie danych do pliku
+            file_put_contents('users.txt', $user_data, FILE_APPEND);
+            
+            echo json_encode(['success' => true]);
         } catch (Exception $e) {
-            error_log("Error saving application: " . $e->getMessage());
-            echo json_encode(['success' => false, 'error' => 'Error saving application: ' . $e->getMessage()]);
-            exit;
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
         }
-        
-    } catch (Exception $e) {
-        error_log("General Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-        echo json_encode(['success' => false, 'error' => 'An unexpected error occurred: ' . $e->getMessage()]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => $result['error']]);
     }
+    exit;
+}
+
+// Obsługa żądania GET
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $username = $_GET['username'] ?? '';
+    $result = verifyRobloxUsername($username);
+    echo json_encode($result);
+    exit;
 } else {
     error_log("Invalid request method: " . $_SERVER['REQUEST_METHOD']);
     echo json_encode(['success' => false, 'error' => 'Invalid request method']);

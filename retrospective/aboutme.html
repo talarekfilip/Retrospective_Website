@@ -108,6 +108,32 @@
             border-radius: 5px;
         }
         
+        /* Panel administracyjny */
+        .admin-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .admin-link {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-link:hover {
+            background-color: rgba(114, 137, 218, 0.5);
+            transform: translateY(-2px);
+        }
+        
         /* Navigation Bar */
         .navigation {
             position: fixed;
@@ -253,6 +279,14 @@
     </div>
 
     <div class="made-by"><strong>made by tari v1.0.0</strong></div>
+
+    <!-- Panel administracyjny -->
+    <div class="admin-panel">
+        <a href="admin.php" class="admin-link">
+            <i class="fas fa-lock"></i>
+            Panel Administracyjny
+        </a>
+    </div>
 
     <audio id="background-music" autoplay loop>
         <source src="background.mp3" type="audio/mpeg">

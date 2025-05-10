@@ -1,48 +1,55 @@
-# Retrospective Guild Website
+# Retrospective
 
-A website for the Retrospective Guild in Deepwoken, showcasing guild information and allowing potential members to apply.
+## Opis
+Retrospective to strona internetowa z panelem administracyjnym, systemem logowania i funkcjonalnością dodawania newsów. Projekt zawiera również system śledzenia użytkowników z zapisem ich lokalizacji.
 
-## Features
+## Funkcjonalności
+- Panel administracyjny z systemem logowania
+- Dodawanie i wyświetlanie newsów
+- System śledzenia użytkowników (nickname, IP, lokalizacja)
+- Responsywny design z animowanym tłem
+- Weryfikacja nazw użytkowników
 
-- Responsive design with dark theme
-- Animated loading screen
-- Star falling animation in the background
-- Discord server access after application validation
-- Background music with volume control
+## Wymagania
+- PHP 7.4 lub nowszy
+- MySQL/MariaDB
+- Serwer WWW (np. Apache, Nginx)
 
-## Recent Improvements (v1.0.0)
+## Instalacja
+1. Sklonuj repozytorium
+2. Skonfiguruj bazę danych MySQL:
+   - Utwórz bazę danych `39348930_users`
+   - Utwórz tabelę `users` z kolumnami:
+     - `username` (VARCHAR)
+     - `password` (VARCHAR)
+   - Utwórz tabelę `news` z kolumnami:
+     - `id` (AUTO_INCREMENT)
+     - `content` (TEXT)
+     - `created_at` (TIMESTAMP)
+3. Skonfiguruj dostęp do bazy danych w plikach:
+   - `admin.php`
+   - `adminpanel.php`
+4. Upewnij się, że pliki `applications.txt` i `users.txt` mają uprawnienia do zapisu
 
-- Added loading screen with animation
-- Improved navigation with smooth scrolling
-- Enhanced mobile responsiveness
-- Added proper footer with navigation links
-- Improved UI/UX with subtle animations and transitions
-- Added form validation and error/success messages
-- Better organization of CSS and JavaScript code
+## Struktura plików
+- `index.html` - Strona główna
+- `aboutme.html` - Strona "O mnie"
+- `admin.php` - Panel logowania administratora
+- `adminpanel.php` - Panel administracyjny
+- `script.php` - Skrypt obsługujący zapisywanie danych użytkowników
+- `style.css` - Style CSS
+- `script.js` - Skrypty JavaScript
+- `applications.txt` - Plik z zapisanymi aplikacjami
+- `users.txt` - Plik z danymi użytkowników
 
-## File Structure
+## Bezpieczeństwo
+- Hasła są przechowywane w bazie danych
+- Implementacja sesji PHP dla panelu administracyjnego
+- Walidacja danych wejściowych
+- Zabezpieczenie przed SQL injection
 
-- `index.html` - Main page with guild info and application form
-- `aboutme.html` - About page
-- `style.css` - Stylesheet
-- `script.js` - JavaScript functionality
-- `script.php` - Backend for application processing with captcha verification
-- `applications.txt` - Storage file for application data
-- `logo.png/jpg` - Guild logo files
-- `background.mp3` - Background music
+## Autor
+Retrospective Team
 
-## Usage
-
-1. Users visit the site and read about the guild
-2. If interested, they fill out the application form with their ROBLOX nickname
-3. After successful submission, they gain access to the Discord invite link
-
-## Notes
-
-For full functionality, make sure PHP is enabled on your server and that the server has permissions to write to the applications.txt file.
-
-## Credits
-
-- Created by tari
-- v1.0.0 
-
+## Licencja
+Wszelkie prawa zastrzeżone 
