@@ -1,44 +1,56 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
-// Sprawdzenie, czy formularz został wysłany
+// Check if user is already logged in
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header('Location: adminpanel.php');
+    exit;
+}
+
+// Database connection
+$conn = new mysqli('mysql.serwer2520415.home.pl', '39348930_dupadupa', 'zaq1@WSX', '39348930_dupadupa');
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$error = '';
+
+// Handle login
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Połączenie z bazą danych
-    $conn = new mysqli('localhost', '39348930_users', '518632067Ab*', '39348930_users');
-    
-    // Sprawdzenie połączenia
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    
-    $username = $_POST['username'];
+    $username = $conn->real_escape_string($_POST['username']);
     $password = $_POST['password'];
-    
-    // Zapytanie do bazy danych
-    $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+
+    $sql = "SELECT * FROM admins WHERE username = '$username'";
     $result = $conn->query($sql);
-    
+
     if ($result->num_rows > 0) {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_username'] = $username;
-        
-        // Przekierowanie do panelu administracyjnego
-        header('Location: adminpanel.php');
-        exit;
+        $row = $result->fetch_assoc();
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_username'] = $username;
+            header('Location: adminpanel.php');
+            exit;
+        } else {
+            $error = 'Invalid password';
+        }
     } else {
-        $error_message = "Nieprawidłowa nazwa użytkownika lub hasło.";
+        $error = 'Invalid username';
     }
-    
-    $conn->close();
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administracyjny - Logowanie</title>
+    <title>Admin Login - Retrospective Guild</title>
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -82,12 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         .login-container {
             background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
             backdrop-filter: blur(5px);
             max-width: 400px;
             width: 90%;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            width: 80px;
+            height: 80px;
         }
 
         .login-header {
@@ -101,33 +124,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             color: #7289DA;
         }
 
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
+            display: block;
+            margin-bottom: 8px;
             font-size: 16px;
             font-weight: 500;
         }
 
         .form-group input {
+            width: 100%;
             padding: 12px 15px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.5);
             color: white;
             font-size: 16px;
-            width: 100%;
             outline: none;
             transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
@@ -136,7 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             box-shadow: 0 0 0 3px rgba(114, 137, 218, 0.3);
         }
 
-        .login-button {
+        .submit-button {
+            width: 100%;
             padding: 12px 20px;
             background-color: #7289DA;
             color: white;
@@ -150,13 +169,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-top: 10px;
         }
 
-        .login-button:hover {
+        .submit-button:hover {
             background-color: #5865F2;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .back-link {
@@ -176,27 +201,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             text-decoration: underline;
         }
 
-        .error-message {
-            background-color: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border: 1px solid rgba(220, 53, 69, 0.3);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .logo-container img {
-            width: 60px;
-            height: 60px;
-        }
-
         @media (max-width: 480px) {
             .login-container {
                 padding: 20px;
@@ -209,70 +213,63 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <div class="sky"></div> <!-- Tło gwiazd -->
+    <div class="sky"></div>
 
     <div class="login-container">
         <div class="logo-container">
             <img src="logo.png" alt="Retrospective">
         </div>
         <div class="login-header">
-            <h1>Panel Administracyjny</h1>
-            <p>Zaloguj się, aby uzyskać dostęp do panelu administracyjnego</p>
+            <h1>Admin Login</h1>
+            <p>Please sign in to access the admin panel</p>
         </div>
 
-        <?php if (isset($error_message)): ?>
+        <?php if ($error): ?>
             <div class="error-message">
-                <?php echo $error_message; ?>
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
 
-        <form class="login-form" method="POST" action="">
+        <form method="POST" action="">
             <div class="form-group">
-                <label for="username">Nazwa użytkownika</label>
+                <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
-                <label for="password">Hasło</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" class="login-button">
+            <button type="submit" class="submit-button">
                 <i class="fas fa-sign-in-alt"></i>
-                Zaloguj się
+                Sign In
             </button>
         </form>
 
         <div class="back-link">
-            <a href="index.html">
-                <i class="fas fa-arrow-left"></i> Powrót do strony głównej
-            </a>
+            <a href="index.html">Back to Homepage</a>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const sky = document.querySelector(".sky");
+        // Create stars in the background
+        function createStars() {
+            const sky = document.querySelector('.sky');
+            const starCount = 100;
 
-            function createStar() {
-                const star = document.createElement("div");
-                star.classList.add("star");
-
-                const size = Math.random() * 3 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${Math.random() * 100}vw`;
-                star.style.top = `-${size}px`;
-                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                star.style.animationDelay = `${Math.random()}s`;
-
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = Math.random() * 3 + 2 + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
                 sky.appendChild(star);
-
-                setTimeout(() => {
-                    star.remove();
-                }, 5000);
             }
+        }
 
-            setInterval(createStar, 100);
-        });
+        createStars();
     </script>
 </body>
 </html> 

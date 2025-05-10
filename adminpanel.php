@@ -1,38 +1,53 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 
-// Sprawdzenie, czy użytkownik jest zalogowany
+// Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: admin.php');
     exit;
 }
 
-// Połączenie z bazą danych
-$conn = new mysqli('localhost', '39348930_users', '518632067Ab*', '39348930_users');
+// Database connection
+$conn = new mysqli('mysql.serwer2520415.home.pl', '39348930_dupadupa', 'zaq1@WSX', '39348930_dupadupa');
 
-// Sprawdzenie połączenia
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Obsługa dodawania newsów
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['news'])) {
-    $news = $_POST['news'];
-    $sql = "INSERT INTO news (content) VALUES ('$news')";
+// Handle news deletion
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_news'])) {
+    $news_id = (int)$_POST['delete_news'];
+    $sql = "DELETE FROM news WHERE id = $news_id";
     $conn->query($sql);
+    header('Location: adminpanel.php');
+    exit;
 }
 
-// Pobieranie istniejących newsów
-$sql = "SELECT * FROM news ORDER BY id DESC";
+// Handle news addition
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['news'])) {
+    $news = $conn->real_escape_string($_POST['news']);
+    $title = $conn->real_escape_string($_POST['title']);
+    $sql = "INSERT INTO news (title, content, created_at) VALUES ('$title', '$news', NOW())";
+    $conn->query($sql);
+    header('Location: adminpanel.php');
+    exit;
+}
+
+// Get existing news
+$sql = "SELECT * FROM news ORDER BY created_at DESC";
 $result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administracyjny</title>
+    <title>Admin Panel - Retrospective Guild</title>
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -82,6 +97,7 @@ $result = $conn->query($sql);
             max-width: 800px;
             width: 90%;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin: 20px;
         }
 
         .admin-header {
@@ -113,6 +129,7 @@ $result = $conn->query($sql);
             font-weight: 500;
         }
 
+        .form-group input[type="text"],
         .form-group textarea {
             padding: 12px 15px;
             border: 2px solid rgba(255, 255, 255, 0.2);
@@ -123,10 +140,14 @@ $result = $conn->query($sql);
             width: 100%;
             outline: none;
             transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
             min-height: 100px;
             resize: vertical;
         }
 
+        .form-group input[type="text"]:focus,
         .form-group textarea:focus {
             border-color: #7289DA;
             background: rgba(0, 0, 0, 0.7);
@@ -162,15 +183,43 @@ $result = $conn->query($sql);
 
         .news-item {
             background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             margin-bottom: 15px;
+            position: relative;
+        }
+
+        .news-item h3 {
+            margin: 0 0 10px 0;
+            color: #7289DA;
         }
 
         .news-item p {
             margin: 0;
             font-size: 16px;
             line-height: 1.5;
+        }
+
+        .news-item .date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 10px;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #ff4444;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .delete-button:hover {
+            color: #ff0000;
         }
 
         .back-link {
@@ -213,75 +262,80 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-    <div class="sky"></div> <!-- Tło gwiazd -->
+    <div class="sky"></div>
 
     <div class="admin-container">
         <div class="logo-container">
             <img src="logo.png" alt="Retrospective">
         </div>
         <div class="admin-header">
-            <h1>Panel Administracyjny</h1>
-            <p>Witaj, <?php echo $_SESSION['admin_username']; ?>!</p>
+            <h1>Admin Panel</h1>
+            <p>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?>!</p>
         </div>
 
         <form class="news-form" method="POST" action="">
             <div class="form-group">
-                <label for="news">Dodaj nowość</label>
+                <label for="title">News Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="news">News Content</label>
                 <textarea id="news" name="news" required></textarea>
             </div>
             <button type="submit" class="submit-button">
                 <i class="fas fa-paper-plane"></i>
-                Dodaj
+                Add News
             </button>
         </form>
 
         <div class="news-list">
-            <h2>Ostatnie nowości</h2>
+            <h2>Recent News</h2>
             <?php
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
                     echo '<div class="news-item">';
-                    echo '<p>' . $row['content'] . '</p>';
+                    echo '<form method="POST" action="" style="display: inline;">';
+                    echo '<input type="hidden" name="delete_news" value="' . $row['id'] . '">';
+                    echo '<button type="submit" class="delete-button" onclick="return confirm(\'Are you sure you want to delete this news?\')">';
+                    echo '<i class="fas fa-trash"></i>';
+                    echo '</button>';
+                    echo '</form>';
+                    echo '<h3>' . htmlspecialchars($row['title']) . '</h3>';
+                    echo '<p>' . nl2br(htmlspecialchars($row['content'])) . '</p>';
+                    echo '<div class="date">Posted on: ' . date('F j, Y, g:i a', strtotime($row['created_at'])) . '</div>';
                     echo '</div>';
                 }
             } else {
-                echo '<p>Brak nowości.</p>';
+                echo '<p>No news available.</p>';
             }
             ?>
         </div>
 
         <div class="back-link">
-            <a href="index.html">
-                <i class="fas fa-arrow-left"></i> Powrót do strony głównej
-            </a>
+            <a href="index.html">Back to Homepage</a>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const sky = document.querySelector(".sky");
+        // Create stars in the background
+        function createStars() {
+            const sky = document.querySelector('.sky');
+            const starCount = 100;
 
-            function createStar() {
-                const star = document.createElement("div");
-                star.classList.add("star");
-
-                const size = Math.random() * 3 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${Math.random() * 100}vw`;
-                star.style.top = `-${size}px`;
-                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                star.style.animationDelay = `${Math.random()}s`;
-
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = Math.random() * 3 + 2 + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
                 sky.appendChild(star);
-
-                setTimeout(() => {
-                    star.remove();
-                }, 5000);
             }
+        }
 
-            setInterval(createStar, 100);
-        });
+        createStars();
     </script>
 </body>
 </html>
