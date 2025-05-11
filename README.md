@@ -1,6 +1,6 @@
 # Retrospective Guild Website
 
-A modern, responsive website for the Retrospective Guild - a consistent TOP 20 EU guild in Deepwoken.
+A modern, responsive website for the Retrospective Guild
 
 ## Features
 
