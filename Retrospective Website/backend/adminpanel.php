@@ -51,8 +51,9 @@ $users = file_exists('users.txt') ? file('users.txt', FILE_IGNORE_NEW_LINES | FI
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Retrospective Guild</title>
-    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="icon" href="../assets/images/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../frontend/css/style.css">
     <style>
         body {
             margin: 0;
@@ -291,13 +292,13 @@ $users = file_exists('users.txt') ? file('users.txt', FILE_IGNORE_NEW_LINES | FI
 </head>
 <body>
     <audio id="hymnAudio" style="display: none;">
-        <source src="hymnpolski.mp3" type="audio/mpeg">
+        <source src="../assets/audio/hymnpolski.mp3" type="audio/mpeg">
     </audio>
     <div class="sky"></div>
 
     <div class="admin-container">
         <div class="logo-container">
-            <img src="logo.png" alt="Retrospective">
+            <img src="../assets/images/logo.png" alt="Retrospective">
         </div>
         <div class="admin-header">
             <h1>Admin Panel</h1>
@@ -365,7 +366,7 @@ $users = file_exists('users.txt') ? file('users.txt', FILE_IGNORE_NEW_LINES | FI
         </div>
 
         <div class="back-link">
-            <a href="index.php">Back to Homepage</a>
+            <a href="../frontend/index.php">Back to Homepage</a>
         </div>
 
         <div class="made-by-admin">made by tari v0.1</div>

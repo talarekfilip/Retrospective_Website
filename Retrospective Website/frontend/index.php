@@ -1,4 +1,5 @@
 <?php
+require_once '../backend/includes/navbar.php';
 // Połączenie z bazą danych
 $conn = new mysqli('localhost2', '39348930_dupadupa', 'zaq1@WSX', '39348930_dupadupa');
 
@@ -22,10 +23,10 @@ $result = $conn->query($sql);
     <meta property="og:description" content="Retrospective. Const Top 20 Guild in Deepwoken.">
     <meta property="og:image" content="http://retrospective.com.pl/logo.jpg">
     <meta property="og:url" content="http://retrospective.com.pl">
-    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="icon" href="../assets/images/logo.png" type="image/png">
 
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <style>
         .latest-news {
             max-width: 1000px;
@@ -226,6 +227,6 @@ $result = $conn->query($sql);
         <source src="./background.mp3" type="audio/mpeg">
     </audio>
     
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html> 
