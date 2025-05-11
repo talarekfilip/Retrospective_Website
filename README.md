@@ -49,7 +49,7 @@ Retrospective to strona internetowa z panelem administracyjnym, systemem logowan
 - Zabezpieczenie przed SQL injection
 
 ## Autor
-Retrospective Team
+tari
 
 ## Licencja
 Wszelkie prawa zastrzeżone 
