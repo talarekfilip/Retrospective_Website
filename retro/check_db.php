@@ -59,4 +59,8 @@ while($row = $result->fetch_assoc()) {
     print_r($row);
 }
 echo "</pre>";
+
+$password = 'NOWE_HASLO'; // Zmień to na hasło, które chcesz użyć
+$hash = password_hash($password, PASSWORD_DEFAULT);
+echo "Hash dla hasła '$password': " . $hash;
 ?> 
