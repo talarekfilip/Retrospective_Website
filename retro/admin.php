@@ -2,44 +2,54 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: admin.php');
+// Check if user is already logged in
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header('Location: adminpanel.php');
     exit;
 }
 
-// Database connection
-$conn = new mysqli('mysql.serwer2520415.home.pl', '39348930_dupadupa', 'zaq1@WSX', '39348930_dupadupa');
+// Połączenie z bazą danych
+$conn = new mysqli('localhost2', '39348930_dupadupa', 'zaq1@WSX', '39348930_dupadupa');
 
-// Check connection
+// Sprawdzenie połączenia
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle news deletion
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_news'])) {
-    $news_id = (int)$_POST['delete_news'];
-    $sql = "DELETE FROM news WHERE id = $news_id";
-    $conn->query($sql);
-    header('Location: adminpanel.php');
-    exit;
-}
+$error = '';
 
-// Handle news addition
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['news'])) {
-    $news = $conn->real_escape_string($_POST['news']);
-    $title = $conn->real_escape_string($_POST['title']);
-    $sql = "INSERT INTO news (title, content, created_at) VALUES ('$title', '$news', NOW())";
-    $conn->query($sql);
-    header('Location: adminpanel.php');
-    exit;
-}
+// Handle login
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $conn->real_escape_string($_POST['username']);
+    $password = $_POST['password'];
 
-// Get existing news
-$sql = "SELECT * FROM news ORDER BY created_at DESC";
-$result = $conn->query($sql);
+    $sql = "SELECT * FROM admins WHERE username = '$username'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        // Debugowanie
+        error_log("Próba logowania - username: " . $username);
+        error_log("Hash z bazy: " . $row['password']);
+        error_log("Wprowadzone hasło: " . $password);
+        
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_username'] = $username;
+            header('Location: adminpanel.php');
+            exit;
+        } else {
+            $error = 'Invalid password';
+            error_log("Weryfikacja hasła nie powiodła się");
+        }
+    } else {
+        $error = 'Invalid username';
+        error_log("Nie znaleziono użytkownika: " . $username);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +57,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Retrospective Guild</title>
+    <title>Admin Login - Retrospective Guild</title>
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -89,72 +99,70 @@ $result = $conn->query($sql);
             to { transform: translateY(100vh); }
         }
 
-        .admin-container {
+        .login-container {
             background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
             backdrop-filter: blur(5px);
-            max-width: 800px;
+            max-width: 400px;
             width: 90%;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            margin: 20px;
         }
 
-        .admin-header {
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .login-header {
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .admin-header h1 {
+        .login-header h1 {
             font-size: 28px;
             margin-bottom: 10px;
             color: #7289DA;
         }
 
-        .news-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
         .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
+            display: block;
+            margin-bottom: 8px;
             font-size: 16px;
             font-weight: 500;
         }
 
-        .form-group input[type="text"],
-        .form-group textarea {
+        .form-group input {
+            width: 100%;
             padding: 12px 15px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.5);
             color: white;
             font-size: 16px;
-            width: 100%;
             outline: none;
             transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .form-group input[type="text"]:focus,
-        .form-group textarea:focus {
+        .form-group input:focus {
             border-color: #7289DA;
             background: rgba(0, 0, 0, 0.7);
             box-shadow: 0 0 0 3px rgba(114, 137, 218, 0.3);
         }
 
         .submit-button {
+            width: 100%;
             padding: 12px 20px;
             background-color: #7289DA;
             color: white;
@@ -168,7 +176,6 @@ $result = $conn->query($sql);
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-top: 10px;
         }
 
         .submit-button:hover {
@@ -177,49 +184,11 @@ $result = $conn->query($sql);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .news-list {
-            margin-top: 30px;
-        }
-
-        .news-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .news-item h3 {
-            margin: 0 0 10px 0;
-            color: #7289DA;
-        }
-
-        .news-item p {
-            margin: 0;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        .news-item .date {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 10px;
-        }
-
-        .delete-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
+        .error-message {
             color: #ff4444;
-            cursor: pointer;
-            padding: 5px;
-            transition: color 0.3s ease;
-        }
-
-        .delete-button:hover {
-            color: #ff0000;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .back-link {
@@ -239,23 +208,12 @@ $result = $conn->query($sql);
             text-decoration: underline;
         }
 
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .logo-container img {
-            width: 60px;
-            height: 60px;
-        }
-
         @media (max-width: 480px) {
-            .admin-container {
+            .login-container {
                 padding: 20px;
             }
 
-            .admin-header h1 {
+            .login-header h1 {
                 font-size: 24px;
             }
         }
@@ -264,52 +222,35 @@ $result = $conn->query($sql);
 <body>
     <div class="sky"></div>
 
-    <div class="admin-container">
+    <div class="login-container">
         <div class="logo-container">
             <img src="logo.png" alt="Retrospective">
         </div>
-        <div class="admin-header">
-            <h1>Admin Panel</h1>
-            <p>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?>!</p>
+        <div class="login-header">
+            <h1>Admin Login</h1>
+            <p>Please sign in to access the admin panel</p>
         </div>
 
-        <form class="news-form" method="POST" action="">
+        <?php if ($error): ?>
+            <div class="error-message">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="">
             <div class="form-group">
-                <label for="title">News Title</label>
-                <input type="text" id="title" name="title" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
-                <label for="news">News Content</label>
-                <textarea id="news" name="news" required></textarea>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="submit-button">
-                <i class="fas fa-paper-plane"></i>
-                Add News
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
             </button>
         </form>
-
-        <div class="news-list">
-            <h2>Recent News</h2>
-            <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    echo '<div class="news-item">';
-                    echo '<form method="POST" action="" style="display: inline;">';
-                    echo '<input type="hidden" name="delete_news" value="' . $row['id'] . '">';
-                    echo '<button type="submit" class="delete-button" onclick="return confirm(\'Are you sure you want to delete this news?\')">';
-                    echo '<i class="fas fa-trash"></i>';
-                    echo '</button>';
-                    echo '</form>';
-                    echo '<h3>' . htmlspecialchars($row['title']) . '</h3>';
-                    echo '<p>' . nl2br(htmlspecialchars($row['content'])) . '</p>';
-                    echo '<div class="date">Posted on: ' . date('F j, Y, g:i a', strtotime($row['created_at'])) . '</div>';
-                    echo '</div>';
-                }
-            } else {
-                echo '<p>No news available.</p>';
-            }
-            ?>
-        </div>
 
         <div class="back-link">
             <a href="index.html">Back to Homepage</a>
@@ -338,4 +279,4 @@ $result = $conn->query($sql);
         createStars();
     </script>
 </body>
-</html>
+</html> 

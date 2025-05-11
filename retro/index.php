@@ -1,5 +1,18 @@
+<?php
+// Połączenie z bazą danych
+$conn = new mysqli('localhost2', '39348930_dupadupa', 'zaq1@WSX', '39348930_dupadupa');
+
+// Sprawdzenie połączenia
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Pobieranie newsów
+$sql = "SELECT * FROM news ORDER BY created_at DESC LIMIT 1";
+$result = $conn->query($sql);
+?>
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,6 +26,67 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .latest-news {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(40,44,52,0.95);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .news-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .news-header h2 {
+            color: #7289DA;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .news-list {
+            display: grid;
+            gap: 20px;
+        }
+        .news-item {
+            background: rgba(255,255,255,0.07);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .news-item h3 {
+            color: #7289DA;
+            margin: 0 0 15px 0;
+            font-size: 1.3rem;
+        }
+        .news-item p {
+            margin: 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #fff;
+        }
+        .news-item .date {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        .view-all-news {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .view-all-news a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #7289DA;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 7px;
+            transition: background 0.2s;
+        }
+        .view-all-news a:hover {
+            background: #5865F2;
+        }
+    </style>
 </head>
 <body>
     <div id="loading-screen">
@@ -40,6 +114,33 @@
     <div class="spacer"></div>
 
     <div class="title">Retrospective. Const Top 20 Guild in Deepwoken.</div>
+
+    <!-- Sekcja z newsami -->
+    <div class="latest-news">
+        <div class="news-header">
+            <h2>Latest news</h2>
+        </div>
+        
+        <div class="news-list">
+            <?php
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    echo '<div class="news-item">';
+                    echo '<h3>' . htmlspecialchars($row['title']) . '</h3>';
+                    echo '<p>' . nl2br(htmlspecialchars($row['content'])) . '</p>';
+                    echo '<div class="date">Added: ' . date('M d, Y H:i', strtotime($row['created_at'])) . '</div>';
+                    echo '</div>';
+                }
+            } else {
+                echo '<p>No news to display.</p>';
+            }
+            ?>
+        </div>
+        
+        <div class="view-all-news">
+            <a href="news.php">See all news</a>
+        </div>
+    </div>
 
     <div class="services">
         <div class="service-guild-info" onclick="scrollToGuildAdvert()">
@@ -118,7 +219,7 @@
                 </ul>
             </div>
         </div>
-        <div class="made-by"><strong>made by tari v1.0.0</strong></div>
+        <div class="made-by"><strong>made by tari v1.1.0</strong></div>
     </footer>
 
     <audio id="background-music" autoplay loop>
@@ -127,4 +228,4 @@
     
     <script src="script.js"></script>
 </body>
-</html>
+</html> 
