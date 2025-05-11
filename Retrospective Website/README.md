@@ -1,55 +1,107 @@
-# Retrospective
+# Retrospective Guild Website
 
-## Opis
-Retrospective to strona internetowa z panelem administracyjnym, systemem logowania i funkcjonalnością dodawania newsów. Projekt zawiera również system śledzenia użytkowników z zapisem ich lokalizacji.
+A modern, responsive website for the Retrospective Guild - a consistent TOP 20 EU guild in Deepwoken.
 
-## Funkcjonalności
-- Panel administracyjny z systemem logowania
-- Dodawanie i wyświetlanie newsów
-- System śledzenia użytkowników (nickname, IP, lokalizacja)
-- Responsywny design z animowanym tłem
-- Weryfikacja nazw użytkowników
+## Features
 
-## Wymagania
-- PHP 7.4 lub nowszy
+- 🎮 Guild information and recruitment system
+- 📰 Dynamic news system with admin panel
+- 🎵 Background music and Polish anthem in admin panel
+- 🌟 Animated starry background
+- 📱 Fully responsive design
+- 🔒 Secure admin authentication
+- 📊 User tracking system
+
+## Project Structure
+
+```
+Retrospective Website/
+├── frontend/
+│   ├── css/          # Stylesheets
+│   ├── js/           # JavaScript files
+│   ├── images/       # Frontend-specific images
+│   ├── index.php     # Main page
+│   └── aboutme.html  # About page
+├── backend/
+│   ├── config/       # Configuration files
+│   │   ├── database.php
+│   │   ├── database.sql
+│   │   └── check_db.php
+│   ├── includes/     # PHP includes
+│   │   └── navbar.php
+│   ├── adminpanel.php
+│   ├── admin.php
+│   ├── news.php
+│   └── script.php
+└── assets/
+    ├── audio/        # Audio files
+    │   ├── hymnpolski.mp3
+    │   └── background.mp3
+    └── images/       # Shared images
+        ├── logo.png
+        └── logo.jpg
+```
+
+## Requirements
+
+- PHP 7.4 or higher
 - MySQL/MariaDB
-- Serwer WWW (np. Apache, Nginx)
+- Web server (Apache/Nginx)
 
-## Instalacja
-1. Sklonuj repozytorium
-2. Skonfiguruj bazę danych MySQL:
-   - Utwórz bazę danych `39348930_users`
-   - Utwórz tabelę `users` z kolumnami:
-     - `username` (VARCHAR)
-     - `password` (VARCHAR)
-   - Utwórz tabelę `news` z kolumnami:
-     - `id` (AUTO_INCREMENT)
-     - `content` (TEXT)
-     - `created_at` (TIMESTAMP)
-3. Skonfiguruj dostęp do bazy danych w plikach:
-   - `admin.php`
-   - `adminpanel.php`
-4. Upewnij się, że pliki `applications.txt` i `users.txt` mają uprawnienia do zapisu
+## Installation
 
-## Struktura plików
-- `index.html` - Strona główna
-- `aboutme.html` - Strona "O mnie"
-- `admin.php` - Panel logowania administratora
-- `adminpanel.php` - Panel administracyjny
-- `script.php` - Skrypt obsługujący zapisywanie danych użytkowników
-- `style.css` - Style CSS
-- `script.js` - Skrypty JavaScript
-- `applications.txt` - Plik z zapisanymi aplikacjami
-- `users.txt` - Plik z danymi użytkowników
+1. Clone the repository
+2. Import the database schema from `backend/config/database.sql`
+3. Configure database connection in `backend/config/database.php`
+4. Set up your web server to point to the project directory
+5. Ensure proper permissions are set for file uploads and logs
 
-## Bezpieczeństwo
-- Hasła są przechowywane w bazie danych
-- Implementacja sesji PHP dla panelu administracyjnego
-- Walidacja danych wejściowych
-- Zabezpieczenie przed SQL injection
+## Configuration
 
-## Autor
-tari
+Database configuration can be modified in `backend/config/database.php`:
 
-## Licencja
-Wszelkie prawa zastrzeżone 
+```php
+define('DB_HOST', 'your_host');
+define('DB_USER', 'your_username');
+define('DB_PASS', 'your_password');
+define('DB_NAME', 'your_database');
+```
+
+## Features in Detail
+
+### Admin Panel
+- Secure login system
+- News management (add/delete)
+- User tracking
+- Background music control
+- Polish anthem playback
+
+### Frontend
+- Responsive design
+- Dynamic news display
+- Guild information section
+- Recruitment form
+- Discord integration
+- Animated backgrounds
+
+### Security
+- SQL injection prevention
+- XSS protection
+- Secure session management
+- Input validation
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+## License
+
+This project is proprietary and confidential. All rights reserved.
+
+## Author
+
+Created by tari (v1.1.0) 
