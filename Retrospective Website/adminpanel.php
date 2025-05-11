@@ -290,6 +290,9 @@ $users = file_exists('users.txt') ? file('users.txt', FILE_IGNORE_NEW_LINES | FI
     </style>
 </head>
 <body>
+    <audio id="hymnAudio" style="display: none;">
+        <source src="hymnpolski.mp3" type="audio/mpeg">
+    </audio>
     <div class="sky"></div>
 
     <div class="admin-container">
@@ -362,7 +365,7 @@ $users = file_exists('users.txt') ? file('users.txt', FILE_IGNORE_NEW_LINES | FI
         </div>
 
         <div class="back-link">
-            <a href="index.html">Back to Homepage</a>
+            <a href="index.php">Back to Homepage</a>
         </div>
 
         <div class="made-by-admin">made by tari v0.1</div>
@@ -387,7 +390,49 @@ $users = file_exists('users.txt') ? file('users.txt', FILE_IGNORE_NEW_LINES | FI
             }
         }
 
-        createStars();
+        // Funkcja do odtwarzania hymnu
+        function playHymn() {
+            const hymnAudio = document.getElementById('hymnAudio');
+            hymnAudio.volume = 0.5; // Ustawienie głośności na 50%
+            hymnAudio.loop = true; // Zapętlanie
+            hymnAudio.play().catch(function(error) {
+                console.log("Automatyczne odtwarzanie zostało zablokowane przez przeglądarkę");
+            });
+        }
+
+        // Próba odtworzenia hymnu po załadowaniu strony
+        window.addEventListener('load', function() {
+            createStars();
+            playHymn();
+        });
+
+        // Dodanie przycisku do włączania/wyłączania hymnu
+        const adminHeader = document.querySelector('.admin-header');
+        const soundButton = document.createElement('button');
+        soundButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+        soundButton.style.cssText = `
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(114, 137, 218, 0.2);
+            border: none;
+            color: #7289DA;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        soundButton.onclick = function() {
+            const hymnAudio = document.getElementById('hymnAudio');
+            if (hymnAudio.paused) {
+                hymnAudio.play();
+                this.innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                hymnAudio.pause();
+                this.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+        };
+        document.body.appendChild(soundButton);
     </script>
 </body>
 </html>
