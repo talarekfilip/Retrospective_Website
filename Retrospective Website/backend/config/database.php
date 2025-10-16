@@ -1,7 +1,7 @@
 <?php
-define('DB_HOST', 'localhost2');
-define('DB_USER', '39348930_dupadupa');
-define('DB_PASS', 'zaq1@WSX');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 define('DB_NAME', '39348930_dupadupa');
 
 function getDBConnection() {
